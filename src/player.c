@@ -449,7 +449,7 @@ void displayPlayerInfo(Player* player) {
     if (!player) return;
 
     printf("═══════════════════════════════════════════\n");
-    printf("👤 玩家: %s\n", player->name);
+    printf(" 玩家: %s\n", player->name);
     printf("等级: %d | 经验: %d/%d\n",
         player->level, player->exp, player->maxExp);
 

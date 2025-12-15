@@ -1,7 +1,8 @@
 #ifndef SHOP_H
 #define SHOP_H
 
-#include "backpack.h"
+#include "../include/backpack.h"
+#include "../include/commontypes.h"
 
 // 商店商品结构（内部使用）
 typedef struct {
@@ -25,7 +26,7 @@ void displayShop(Shop* shop, Backpack* backpack);
 void displayShopItemDetails(Shop* shop, Backpack* backpack);
 void buySelectedItem(Shop* shop, Backpack* backpack);
 int handleShopInput(Shop* shop, Backpack* backpack);
-void shop();
+void shop(Backpack *backpack);
 
 
 // 辅助函数（可选，供商店内部使用）

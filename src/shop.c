@@ -31,9 +31,10 @@ int getPlayerItemCount(Backpack* backpack, int itemId, ItemType type) {
     return count;
 }
 
-// 初始化商店）
+// 初始化商店
 void initShop(Shop* shop, Backpack* backpack) {
     if (!shop) return;
+    //initBackpack(backpack);
 
     shop->itemCount = 8;  // 8种商品
     shop->items = (ShopItem*)malloc(sizeof(ShopItem) * shop->itemCount);
@@ -136,9 +137,9 @@ void displayShop(Shop* shop, Backpack* backpack) {
     if (!shop || !backpack) return;
 
     printf("═══════════════════════════════════════════\n");
-    printf("🏪  商 店\n");
+    printf("  商 店\n");
     printf("═══════════════════════════════════════════\n");
-    printf("💰 你的金币: %d\n", backpack->money);
+    printf(" 你的金币: %d\n", backpack->money);
     printf("═══════════════════════════════════════════\n\n");
 
     printf("商品列表:\n");
@@ -188,7 +189,7 @@ void displayShopItemDetails(Shop* shop, Backpack* backpack) {
     Item* item = selectedShopItem->item;
 
     printf("\n═══════════════════════════════════════════\n");
-    printf("🛒 商品详情:\n");
+    printf(" 商品详情:\n");
     printf("═══════════════════════════════════════════\n");
 
     // 显示基本信息
@@ -235,14 +236,14 @@ void displayShopItemDetails(Shop* shop, Backpack* backpack) {
     // 显示购买能力
     if (backpack->money >= selectedShopItem->price) {
         if (selectedShopItem->isUnlimited || selectedShopItem->stock > 0) {
-            printf("\n💰 你可以购买此商品 (按E键购买)\n");
+            printf("\n你可以购买此商品 (按E键购买)\n");
         }
         else {
-            printf("\n❌ 商品已售罄\n");
+            printf("\n商品已售罄\n");
         }
     }
     else {
-        printf("\n❌ 金币不足！\n");
+        printf("\n金币不足！\n");
     }
 
     printf("═══════════════════════════════════════════\n");
@@ -257,14 +258,14 @@ void buySelectedItem(Shop* shop, Backpack* backpack) {
 
     // 检查库存
     if (!selectedShopItem->isUnlimited && selectedShopItem->stock <= 0) {
-        printf("\n❌ 商品已售罄！\n");
+        printf("\n商品已售罄！\n");
 		Sleep(500);
         return;
     }
 
     // 检查金币
     if (backpack->money < selectedShopItem->price) {
-        printf("\n❌ 金币不足！需要 %d 金币，你只有 %d 金币。\n",
+        printf("\n金币不足！需要 %d 金币，你只有 %d 金币。\n",
             selectedShopItem->price, backpack->money);
 		Sleep(500);
         return;
@@ -309,24 +310,24 @@ void buySelectedItem(Shop* shop, Backpack* backpack) {
 
     if (newItem) {
         addItem(backpack, newItem);
-        printf("\n✅ 购买成功！%s 已添加到背包。\n", item->name);
+        printf("\n 购买成功！%s 已添加到背包。\n", item->name);
         printf("剩余金币: %d\n", backpack->money);
 
         // 特殊商品效果
         if (item->id == 301) { // 背包扩展券
             backpack->capacity += 10;
-            printf("🎒 背包容量增加10格，当前容量: %d\n", backpack->capacity);
+            printf("背包容量增加10格，当前容量: %d\n", backpack->capacity);
         }
         else if (item->id == 302) { // 金币福袋
             srand(time(NULL));
             int bonus = 500 + rand() % 1001; // 500-1500随机金币
             backpack->money += bonus;
-            printf("🎁 打开福袋获得 %d 金币！\n", bonus);
+            printf("打开福袋获得 %d 金币！\n", bonus);
             printf("当前金币: %d\n", backpack->money);
         }
     }
     else {
-        printf("\n❌ 购买失败！无法创建物品。\n");
+        printf("\n购买失败！无法创建物品。\n");
         backpack->money += selectedShopItem->price; // 返还金币
         if (!selectedShopItem->isUnlimited) {
             selectedShopItem->stock++; // 恢复库存
@@ -372,33 +373,31 @@ int handleShopInput(Shop* shop, Backpack* backpack) {
         }
     }
 }
-void shop() {
-    Backpack backpack;
-    initBackpack(&backpack);
+void shop(Backpack *backpack) {
 
     // 创建商店
     Shop shop;
-    initShop(&shop, &backpack);
+    initShop(&shop, backpack);
 
     int inShop = 1;
 
     // 商店主循环
     while (inShop) {
         clearScreen();
-        displayShop(&shop, &backpack);
-        displayShopItemDetails(&shop, &backpack);
+        displayShop(&shop, backpack);
+        displayShopItemDetails(&shop, backpack);
 
-        printf("\n🎮 操作说明:\n");
+        printf("\n操作说明:\n");
         printf("W/S - 上/下选择商品\n");
         printf("E   - 购买选中商品\n");
         printf("Q   - 离开商店\n");
         printf("═══════════════════════════════════════════\n");
 
-        inShop = handleShopInput(&shop, &backpack);
+        inShop = handleShopInput(&shop, backpack);
     }
 
     // 清理商店
     cleanupShop(&shop);
     // 清理背包（会自动保存）
-    cleanupBackpack(&backpack);
+    //cleanupBackpack(backpack);
 }

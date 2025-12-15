@@ -25,11 +25,13 @@ void initBackpack(Backpack* backpack) {
 
     // 尝试从文件加载
     if (!loadBackpackData(backpack, BACKPACK_FILE, MONEY_FILE)) {
+        printf("failes");
+        _getch();
         // 如果加载失败，使用默认值
         backpack->money = 2000;
         loadSampleItems(backpack);
         printf("创建新的背包存档...\n");
-        Sleep(500);
+        Sleep(1000);
     }
     else {
         printf("成功加载背包存档！\n");
@@ -115,7 +117,7 @@ void cleanupBackpack(Backpack* backpack) {
 
     // 清理内存
     Item* current = backpack->head;
-    while (current) {
+    while (current != NULL) {
         Item* next = current->next;
         current->destroy(current);
         current = next;
@@ -230,7 +232,7 @@ void displayMoney(Backpack* backpack) {
     if (!backpack) return;
 
     printf("═══════════════════════════════════════════\n");
-    printf("💰 金钱: %d 金币\n", backpack->money);
+    printf("金钱: %d 金币\n", backpack->money);
     printf("容量: %d/%d\n", backpack->count, backpack->capacity);
     printf("═══════════════════════════════════════════\n\n");
 }
@@ -301,7 +303,7 @@ void displayRepairInfo(Backpack* backpack) {
     Relic* relic = (Relic*)backpack->selectedRelic;
 
     printf("\n═══════════════════════════════════════════\n");
-    printf("🔧 修复遗物: %s\n", relic->base.name);
+    printf("修复遗物: %s\n", relic->base.name);
     printf("═══════════════════════════════════════════\n");
     printf("当前损坏: %.1f%%\n", relic->damageLevel * 100);
     printf("修复难度: %.1f%%\n", relic->repairDifficulty * 100);
@@ -310,11 +312,11 @@ void displayRepairInfo(Backpack* backpack) {
 
     // 显示修复风险提示
     if (relic->totalRepairTimes > 5) {
-        printf("⚠️  多次修复：该遗物已修复 %d 次，修复难度较高\n", relic->totalRepairTimes);
+        printf("!!!多次修复：该遗物已修复 %d 次，修复难度较高\n", relic->totalRepairTimes);
     }
 
     if (relic->damageLevel > 0.8) {
-        printf("⚠️  高风险：损坏严重，修复失败可能造成更大损坏\n");
+        printf("!!! 高风险：损坏严重，修复失败可能造成更大损坏\n");
     }
 
     printf("\n选择维修套件 (W/S 选择, E 确认, Q 取消):\n");
@@ -427,7 +429,7 @@ void repairSelectedRelic(Backpack* backpack) {
                 float criticalChance = getCriticalFailureChance(repairTool->toolType);
 
                 printf("\n═══════════════════════════════════════════\n");
-                printf("🔧 修复详情:\n");
+                printf("修复详情:\n");
                 printf("遗物: %s\n", relic->base.name);
                 printf("当前损坏: %.1f%%\n", relic->damageLevel * 100);
                 printf("修复工具: %s\n", repairTool->base.name);
@@ -462,7 +464,7 @@ void repairSelectedRelic(Backpack* backpack) {
 
                     // 检查遗物是否完全损毁
                     if (relic->damageLevel >= 0.99) {
-                        printf("\n⚠️  警告：遗物 %s 已几乎完全损毁！\n",
+                        printf("\n!!!警告：遗物 %s 已几乎完全损毁！\n",
                             relic->base.name);
                         printf("   继续修复可能导致永久损坏！\n");
                     }
@@ -835,9 +837,8 @@ void saveGame(Backpack* backpack) {
     }
 }
 
-void backpack(Player *player) {
-    Backpack backpack;
-    initBackpack(&backpack);
+void backpack(Player *player,Backpack*backpack) {
+    //initBackpack(backpack);
 
     int running = 1;
 
@@ -846,19 +847,19 @@ void backpack(Player *player) {
         clearScreen();
 
         // 显示界面
-        displayMoney(&backpack);
-        displayItems(&backpack);
-        displayItemDetails(&backpack);
-        displayControls(&backpack);
+        displayMoney(backpack);
+        displayItems(backpack);
+        displayItemDetails(backpack);
+        displayControls(backpack);
 
         // 处理输入
-        running = handleInput(&backpack, player);
+        running = handleInput(backpack, player);
     }
 
     // 清理（会自动保存）
-    cleanupBackpack(&backpack);
+    //cleanupBackpack(backpack);
 
-    printf("\n背包数据已保存到文件。\n");
+    //printf("\n背包数据已保存到文件。\n");
     Sleep(500);
 
     return 0;

@@ -4,18 +4,14 @@
 #include<Windows.h>
 #include "../include/item.h"
 #include "../include/backpack.h"
-#include "../include/event.h"
 #include "../include/player.h"
 #include "../include/map.h"
 #include "../include/shop.h"
+#include <wchar.h>
+#include <locale.h>
 #define _CRT_SECURE_NO_WARNINGS
 
 
-void pictureGuidance() {}
-
-// 假设您已经写好了这些功能
-void showGameGuide(void) {};    // 游戏指南功能
-void showEncyclopedia(void) {}; // 图鉴功能
 
 // 全局游戏数据
 Player* globalPlayer = NULL;
@@ -38,15 +34,15 @@ typedef enum {
 
 // 菜单选项文本
 const char* menuTexts[MENU_COUNT] = {
-    "🗺️  开始冒险",
-    "👤 查看角色信息",
-    "🎒 打开背包",
-    "🏪 进入商店",
-    "📚 图鉴系统",        // 图鉴
-    "❓ 游戏指南",        // 游戏指南
-    "💾 快速保存",
-    "⚙️  游戏设置",
-    "🚪 退出游戏"
+    " *开始冒险",
+    " *查看角色信息",
+    " *打开背包",
+    " *进入商店",
+    " *图鉴系统",        // 图鉴
+    " *游戏指南",        // 游戏指南
+    " *快速保存",
+    " *游戏设置",
+    " *退出游戏"
 };
 
 // 菜单项描述
@@ -64,10 +60,41 @@ const char* menuDescriptions[MENU_COUNT] = {
 
 // 初始化游戏系统
 int initGameSystem(void) {
-    system("chcp 65001 > nul");
+    //system("chcp 65001 > nul");
 
+    // 1. 必须设置为UTF-8代码页
+    /*SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+
+    // 2. 设置支持特殊符号的字体
+    CONSOLE_FONT_INFOEX font = { 0 };
+    font.cbSize = sizeof(font);
+    font.dwFontSize.Y = 16;  // 适当的大小
+
+    // 尝试不同的字体，找到能显示您所有符号的字体
+    // 按优先级尝试
+    const wchar_t* font_list[] = {
+        L"NSimSun",     // 能显示大多数Unicode符号
+        L"SimSun-ExtB", // 扩展中文字体，符号支持好
+        L"MS Gothic",   // 日文字体，符号支持好
+        L"Consolas",    // 英文字体，支持基本符号
+        L"Lucida Console",
+        NULL
+    };
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    for (int i = 0; font_list[i] != NULL; i++) {
+        wcscpy_s(font.FaceName,_countof(font.FaceName), font_list[i]);
+        if (SetCurrentConsoleFontEx(hConsole, FALSE, &font)) {
+            printf("使用字体: %ls\n", font_list[i]);
+            break;
+        }
+    }*/
+    
     // 1. 初始化背包
     initBackpack(&globalBackpack);
+    //cleanupBackpack(&globalPlayer);
 
     // 2. 加载或创建玩家
     globalPlayer = loadOrCreatePlayer(&globalBackpack);
@@ -113,12 +140,12 @@ void displayMainMenu(int selectedIndex) {
     printf("\n═══════════════════════════════════════════\n");
 
     // 显示选中选项的描述
-    printf("\n📝 %s\n", menuDescriptions[selectedIndex]);
+    printf("\n %s\n", menuDescriptions[selectedIndex]);
 
     // 显示玩家状态
     if (globalPlayer) {
         printf("\n═══════════════════════════════════════════\n");
-        printf("👤 %s | 等级: %d | HP: %d/%d | 💰: %d\n",
+        printf(" %s | 等级: %d | HP: %d/%d | 💰: %d\n",
             globalPlayer->name,
             globalPlayer->level,
             globalPlayer->hp,
@@ -147,7 +174,7 @@ void showPlayerInfoSubMenu(void) {
         // 显示选项
         for (int i = 0; i < infoCount; i++) {
             if (i == selected) {
-                printf("  ▶ ");
+                printf("  > ");
 #ifdef _WIN32
                 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
                 SetConsoleTextAttribute(hConsole, 14);
@@ -196,7 +223,7 @@ void showPlayerInfoSubMenu(void) {
                 break;
 
             case 2: // 删除存档
-                printf("\n⚠️  确定要删除存档并重新开始吗？(Y/N): ");
+                printf("\n⚠  确定要删除存档并重新开始吗？(Y/N): ");
                 char confirm = _getch();
                 if (confirm == 'y' || confirm == 'Y') {
                     // 删除存档文件
@@ -317,7 +344,7 @@ int confirmExitGame(void) {
 
         for (int i = 0; i < exitCount; i++) {
             if (i == selected) {
-                printf("  ▶ ");
+                printf("  > ");
 #ifdef _WIN32
                 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
                 SetConsoleTextAttribute(hConsole, 14);
@@ -336,7 +363,7 @@ int confirmExitGame(void) {
         printf("\n═══════════════════════════════════════════\n");
         printf("操作: W/S键选择 ↑/↓ | 回车键确认\n");
 
-        int ch = getch();
+        int ch = _getch();
         switch (ch) {
         case 'w':
         case 'W':
@@ -385,7 +412,7 @@ void handleMainMenu(void) {
     while (running) {
         displayMainMenu(selectedIndex);
 
-        int ch = getch();
+        int ch = _getch();
 
         switch (ch) {
         case 'w':
@@ -402,7 +429,7 @@ void handleMainMenu(void) {
         case '\n':
             switch (selectedIndex) {
             case MENU_START_GAME: // 开始冒险
-                printf("\n🚀 开始冒险...\n");
+                printf("\n 开始冒险...\n");
                 runMapSelection(&globalMap);
                 break;
 
@@ -412,7 +439,7 @@ void handleMainMenu(void) {
 
             case MENU_BACKPACK: // 打开背包
                 printf("\n打开背包...\n");
-				backpack(&globalBackpack);
+				backpack(&globalPlayer,&globalBackpack);
                 pressAnyKey();
                 break;
 
@@ -435,7 +462,7 @@ void handleMainMenu(void) {
                 if (globalPlayer) {
                     quickSavePlayer(globalPlayer);
                     saveGame(&globalBackpack);
-                    printf("\n✅ 游戏进度已保存！\n");
+                    printf("\n 游戏进度已保存！\n");
                 }
                 pressAnyKey();
                 break;
@@ -472,7 +499,7 @@ void handleMainMenu(void) {
 void showGameTitle(void) {
     clearScreen();
     printf("═══════════════════════════════════════════\n");
-    printf("          🏰 冒险游戏 v1.0 🏰\n");
+    printf("           RELICSEEK v1.0 \n");
     printf("═══════════════════════════════════════════\n");
     printf("          探索未知的世界\n");
     printf("          战胜强大的怪物\n");
@@ -481,9 +508,9 @@ void showGameTitle(void) {
     printf("═══════════════════════════════════════════\n\n");
 
     printf("制作人员:\n");
-    printf("  程序: 冒险者团队\n");
-    printf("  美术: 幻想工作室\n");
-    printf("  音乐: 史诗之声\n");
+    printf("  程序: 四人帮\n");
+    printf("  美术: 四人帮\n");
+    printf("  音乐: 四人帮\n");
     printf("\n═══════════════════════════════════════════\n");
 
     printf("\n按任意键开始游戏...");
@@ -492,6 +519,7 @@ void showGameTitle(void) {
 
 // 游戏主函数
 int main(void) {
+
     // 显示游戏标题
     showGameTitle();
 

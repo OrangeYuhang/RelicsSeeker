@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include "../include/player.h"
 #include "../include/backpack.h"
+#include "../include/commontypes.h"
 
 
 // 视野窗口大小
@@ -127,7 +128,7 @@ int handleMapSelectionInput(MapSystem* map);
 void runMapExploration(MapSystem* map);
 void displayMapView(MapSystem* map);
 void displayPlayerStatus(MapSystem* map);
-void displayControls(MapSystem* map);
+void mapdisplayControls(MapSystem* map);
 bool movePlayerInMap(MapSystem* map, int dx, int dy);
 void interactCurrentCell(MapSystem* map);
 void triggerEvent(MapSystem* map, MapCell* cell);

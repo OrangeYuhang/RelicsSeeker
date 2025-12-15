@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../include/player.h"
+#include "../include/commontypes.h"
 #define ITEM_TYPES 10//物品种类数
 
 // 物品类型枚举

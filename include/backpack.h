@@ -2,6 +2,7 @@
 #define BACKPACK_H
 
 #include "../include/item.h"
+#include "../include/commontypes.h"
 #include <stdio.h>
 
 // ±³°ü×´Ì¬
@@ -53,6 +54,6 @@ void sellSelectedItem(Backpack* backpack);
 int handleInput(Backpack* backpack,Player *player);
 void clearScreen(void);
 int getCurrentCategoryCount(Backpack* backpack);
-void backpack(Player *player);
+void backpack(Player *player,Backpack*backpack);
 
 #endif // BACKPACK_H

@@ -39,7 +39,7 @@ static void clearScreen(void) {
     system("cls");
 }
 
-static void pressAnyKey(void) {
+void pressAnyKey(void) {
     printf("按任意键继续...");
     _getch();
 }
@@ -49,16 +49,16 @@ char getElementChar(MapElement element) {
     switch (element) {
     case MAP_EMPTY:   return ' ';
     case MAP_WALL:    return '#';
-    case MAP_TREE:    return '♣';
-    case MAP_RIVER:   return '≈';
+    case MAP_TREE:    return 'T';
+    case MAP_RIVER:   return '=';
     case MAP_GRASS:   return '.';
-    case MAP_PATH:    return '·';
-    case MAP_TREASURE:return '★';
+    case MAP_PATH:    return ' ';
+    case MAP_TREASURE:return '*';
     case MAP_EVENT:   return '?';
-    case MAP_ENTRANCE:return '↕';
-    case MAP_STAIR:   return '⇅';
-    case MAP_NPC:     return '☻';
-    case MAP_MONSTER: return '☠';
+    case MAP_ENTRANCE:return 'I';
+    case MAP_STAIR:   return 'H';
+    case MAP_NPC:     return '@';
+    case MAP_MONSTER: return 'M';
     case MAP_SHOP:    return '$';
     default:          return '?';
     }
@@ -86,8 +86,8 @@ const char* getElementName(MapElement element) {
 // ==================== 地图生成函数 ====================
 
 void generateForestMap(MultiLayerMap* map) {
-    strcpy(map->mapName, "魔法森林");
-    strcpy(map->mapDescription, "充满神秘生物的古老森林，据说深处藏有宝藏");
+    strcpy_s(map->mapName, sizeof(map->mapName),"魔法森林");
+    strcpy_s(map->mapDescription, sizeof(map->mapDescription), "充满神秘生物的古老森林，据说深处藏有宝藏");
     map->difficulty = 2;
     map->totalLayers = 3;
     map->startLayer = 0;
@@ -99,7 +99,7 @@ void generateForestMap(MultiLayerMap* map) {
     srand(time(NULL));
 
     // 层0：森林地表
-    strcpy(map->layers[0].layerName, "森林地表");
+    strcpy_s(map->layers[0].layerName, sizeof(map->layers[0].layerName), "森林地表");
     map->layers[0].layerNumber = 0;
 
     // 生成基础地形
@@ -116,23 +116,23 @@ void generateForestMap(MultiLayerMap* map) {
                 int r = rand() % 100;
                 if (r < 15) {
                     cell->element = MAP_TREE;
-                    strcpy(cell->description, "茂密的树木");
+                    strcpy_s(cell->description, sizeof(cell->description), "茂密的树木");
                 }
                 else if (r < 25) {
                     cell->element = MAP_GRASS;
-                    strcpy(cell->description, "柔软的草地");
+                    strcpy_s(cell->description, sizeof(cell->description), "柔软的草地");
                 }
                 else if (r < 30 && x > 5 && x < MAP_WIDTH - 6) {
                     cell->element = MAP_RIVER;
-                    strcpy(cell->description, "清澈的小河");
+                    strcpy_s(cell->description, sizeof(cell->description), "清澈的小河");
                 }
                 else {
                     cell->element = MAP_PATH;
-                    strcpy(cell->description, "林间小径");
+                    strcpy_s(cell->description, sizeof(cell->description),"林间小径");
                 }
             }
 
-            cell->isExplored = false;
+            cell->isExplored = true;
             cell->isTriggered = false;
             cell->isOpened = false;
             cell->eventType = MAP_EVENT_NONE;
@@ -142,51 +142,51 @@ void generateForestMap(MultiLayerMap* map) {
     // 设置关键地点
     // 入口
     map->layers[0].cells[5][5].element = MAP_ENTRANCE;
-    strcpy(map->layers[0].cells[5][5].description, "森林入口");
+    strcpy_s(map->layers[0].cells[5][5].description, sizeof(map->layers[0].cells[5][5].description),"森林入口");
 
     // 宝藏1
     map->layers[0].cells[8][12].element = MAP_TREASURE;
     map->layers[0].cells[8][12].treasureType = TREASURE_COINS;
     map->layers[0].cells[8][12].treasureValue = 100;
-    strcpy(map->layers[0].cells[8][12].description, "精灵的宝箱");
+    strcpy_s(map->layers[0].cells[8][12].description,sizeof(map->layers[0].cells[8][12].description), "精灵的宝箱");
 
     // 宝藏2
     map->layers[0].cells[15][8].element = MAP_TREASURE;
     map->layers[0].cells[15][8].treasureType = TREASURE_ITEM;
     map->layers[0].cells[15][8].itemId = 101; // 治疗药水
-    strcpy(map->layers[0].cells[15][8].description, "古老的宝箱");
+    strcpy_s(map->layers[0].cells[15][8].description, sizeof(map->layers[0].cells[15][8].description), "古老的宝箱");
 
     // 治疗事件
     map->layers[0].cells[10][20].element = MAP_EVENT;
     map->layers[0].cells[10][20].eventType = MAP_EVENT_HEAL;
     map->layers[0].cells[10][20].eventValue = 30;
-    strcpy(map->layers[0].cells[10][20].description, "治疗泉水");
+    strcpy_s(map->layers[0].cells[10][20].description, sizeof(map->layers[0].cells[10][20].description),"治疗泉水");
 
     // 陷阱事件
     map->layers[0].cells[12][5].element = MAP_EVENT;
     map->layers[0].cells[12][5].eventType = MAP_EVENT_TRAP;
     map->layers[0].cells[12][5].eventValue = 20;
-    strcpy(map->layers[0].cells[12][5].description, "危险的陷阱");
+    strcpy_s(map->layers[0].cells[12][5].description, sizeof(map->layers[0].cells[12][5].description),"危险的陷阱");
 
     // NPC
     map->layers[0].cells[7][25].element = MAP_NPC;
     map->layers[0].cells[7][25].eventType = MAP_EVENT_QUEST;
-    strcpy(map->layers[0].cells[7][25].description, "森林守护者");
+    strcpy_s(map->layers[0].cells[7][25].description, sizeof(map->layers[0].cells[7][25].description),"森林守护者");
 
     // 商店
     map->layers[0].cells[3][15].element = MAP_SHOP;
-    strcpy(map->layers[0].cells[3][15].description, "旅行商人");
+    strcpy_s(map->layers[0].cells[3][15].description, sizeof(map->layers[0].cells[3][15].description),"旅行商人");
 
     // 怪物
     map->layers[0].cells[10][10].element = MAP_MONSTER;
-    strcpy(map->layers[0].cells[10][10].description, "森林狼");
+    strcpy_s(map->layers[0].cells[10][10].description, sizeof(map->layers[0].cells[10][10].description), "森林狼");
 
     // 下楼楼梯
     map->layers[0].cells[18][5].element = MAP_STAIR;
-    strcpy(map->layers[0].cells[18][5].description, "通往地下洞穴");
+    strcpy_s(map->layers[0].cells[18][5].description, sizeof(map->layers[0].cells[18][5].description),"通往地下洞穴");
 
     // 层1：地下洞穴
-    strcpy(map->layers[1].layerName, "地下洞穴");
+    strcpy_s(map->layers[1].layerName, sizeof(map->layers[1].layerName),"地下洞穴");
     map->layers[1].layerNumber = 1;
 
     for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -200,19 +200,19 @@ void generateForestMap(MultiLayerMap* map) {
                 int r = rand() % 100;
                 if (r < 40) {
                     cell->element = MAP_WALL;
-                    strcpy(cell->description, "岩石墙");
+                    strcpy_s(cell->description, sizeof(cell->description),"岩石墙");
                 }
                 else if (r < 50) {
                     cell->element = MAP_RIVER;
-                    strcpy(cell->description, "地下河");
+                    strcpy_s(cell->description, sizeof(cell->description),"地下河");
                 }
                 else {
                     cell->element = MAP_PATH;
-                    strcpy(cell->description, "洞穴通道");
+                    strcpy_s(cell->description, sizeof(cell->description),"洞穴通道");
                 }
             }
 
-            cell->isExplored = false;
+            cell->isExplored = true;
             cell->isTriggered = false;
             cell->isOpened = false;
             cell->eventType = MAP_EVENT_NONE;
@@ -222,25 +222,25 @@ void generateForestMap(MultiLayerMap* map) {
     // 层1关键地点
     // 上楼楼梯
     map->layers[1].cells[3][3].element = MAP_STAIR;
-    strcpy(map->layers[1].cells[3][3].description, "返回地表");
+    strcpy_s(map->layers[1].cells[3][3].description, sizeof(map->layers[1].cells[3][3].description),"返回地表");
 
     // 宝藏
     map->layers[1].cells[12][20].element = MAP_TREASURE;
     map->layers[1].cells[12][20].treasureType = TREASURE_RELIC;
     map->layers[1].cells[12][20].itemId = 1001; // C级遗物
-    strcpy(map->layers[1].cells[12][20].description, "矿工宝藏");
+    strcpy_s(map->layers[1].cells[12][20].description, sizeof(map->layers[1].cells[12][20].description),"矿工宝藏");
 
     // 谜题事件
     map->layers[1].cells[8][15].element = MAP_EVENT;
     map->layers[1].cells[8][15].eventType = MAP_EVENT_RIDDLE;
-    strcpy(map->layers[1].cells[8][15].description, "古代石碑");
+    strcpy_s(map->layers[1].cells[8][15].description, sizeof(map->layers[1].cells[8][15].description),"古代石碑");
 
     // 下楼楼梯
     map->layers[1].cells[18][10].element = MAP_STAIR;
-    strcpy(map->layers[1].cells[18][10].description, "通往深层");
+    strcpy_s(map->layers[1].cells[18][10].description, sizeof(map->layers[1].cells[18][10].description),"通往深层");
 
     // 层2：古代遗迹
-    strcpy(map->layers[2].layerName, "古代遗迹");
+    strcpy_s(map->layers[2].layerName, sizeof(map->layers[2].layerName), "古代遗迹");
     map->layers[2].layerNumber = 2;
 
     for (int y = 0; y < MAP_HEIGHT; y++) {
@@ -249,19 +249,19 @@ void generateForestMap(MultiLayerMap* map) {
 
             if (y == 0 || y == MAP_HEIGHT - 1 || x == 0 || x == MAP_WIDTH - 1) {
                 cell->element = MAP_WALL;
-                strcpy(cell->description, "遗迹外墙");
+                strcpy_s(cell->description, sizeof(cell->description),"遗迹外墙");
             }
             else if ((x % 4 == 0 && y % 4 == 0) ||
                 (x == MAP_WIDTH / 2 || y == MAP_HEIGHT / 2)) {
                 cell->element = MAP_PATH;
-                strcpy(cell->description, "遗迹走廊");
+                strcpy_s(cell->description, sizeof(cell->description),"遗迹走廊");
             }
             else {
                 cell->element = MAP_GRASS;
-                strcpy(cell->description, "遗迹草地");
+                strcpy_s(cell->description, sizeof(cell->description),"遗迹草地");
             }
 
-            cell->isExplored = false;
+            cell->isExplored = true;
             cell->isTriggered = false;
             cell->isOpened = false;
             cell->eventType = MAP_EVENT_NONE;
@@ -271,22 +271,22 @@ void generateForestMap(MultiLayerMap* map) {
     // 层2关键地点
     // 上楼楼梯
     map->layers[2].cells[2][2].element = MAP_STAIR;
-    strcpy(map->layers[2].cells[2][2].description, "返回洞穴");
+    strcpy_s(map->layers[2].cells[2][2].description, sizeof(map->layers[2].cells[2][2].description),"返回洞穴");
 
     // 最终宝藏
     map->layers[2].cells[15][25].element = MAP_TREASURE;
     map->layers[2].cells[15][25].treasureType = TREASURE_RELIC;
     map->layers[2].cells[15][25].itemId = 1003; // A级遗物
-    strcpy(map->layers[2].cells[15][25].description, "古代神器");
+    strcpy_s(map->layers[2].cells[15][25].description, sizeof(map->layers[2].cells[15][25].description),"古代神器");
 
     // BOSS怪物
     map->layers[2].cells[10][15].element = MAP_MONSTER;
-    strcpy(map->layers[2].cells[10][15].description, "遗迹守护者");
+    strcpy_s(map->layers[2].cells[10][15].description, sizeof(map->layers[2].cells[10][15].description),"遗迹守护者");
 }
 
 void generateCaveMap(MultiLayerMap* map) {
-    strcpy(map->mapName, "火山洞穴");
-    strcpy(map->mapDescription, "炽热的火山洞穴，充满危险和稀有矿物");
+    strcpy_s(map->mapName, sizeof(map->mapName),"火山洞穴");
+    strcpy_s(map->mapDescription, sizeof(map->mapDescription),"炽热的火山洞穴，充满危险和稀有矿物");
     map->difficulty = 4;
     map->totalLayers = 2;
     map->startLayer = 0;
@@ -300,8 +300,8 @@ void generateCaveMap(MultiLayerMap* map) {
 }
 
 void generateRuinsMap(MultiLayerMap* map) {
-    strcpy(map->mapName, "冰封遗迹");
-    strcpy(map->mapDescription, "被冰雪覆盖的古代遗迹，隐藏着失传的秘密");
+    strcpy_s(map->mapName, sizeof(map->mapName),"冰封遗迹");
+    strcpy_s(map->mapDescription, sizeof(map->mapDescription),"被冰雪覆盖的古代遗迹，隐藏着失传的秘密");
     map->difficulty = 6;
     map->totalLayers = 3;
     map->startLayer = 0;
@@ -371,7 +371,7 @@ void displayMapSelection(MapSystem* map) {
         // 高亮显示选中的地图
         if (map->selectedMapIndex == i) {
             setColor(COLOR_HIGHLIGHT);
-            printf("▶ ");
+            printf("> ");
         }
         else {
             setColor(COLOR_NORMAL);
@@ -383,7 +383,7 @@ void displayMapSelection(MapSystem* map) {
 
         if (!currentMap->isUnlocked) {
             setColor(COLOR_WARNING);
-            printf(" [🔒 需等级%d]", currentMap->unlockLevel);
+            printf(" [!!! 需等级%d]", currentMap->unlockLevel);
         }
 
         printf("\n");
@@ -405,7 +405,7 @@ void displayMapSelection(MapSystem* map) {
     setColor(COLOR_TITLE);
     printf("═══════════════════════════════════════════\n");
     setColor(COLOR_NORMAL);
-    printf("🎮 操作说明:\n");
+    printf(" 操作说明:\n");
     printf("W/S - 上下选择地图\n");
     printf("E   - 进入选中的地图\n");
     printf("I   - 查看玩家信息\n");
@@ -416,7 +416,7 @@ void displayMapSelection(MapSystem* map) {
     setColor(COLOR_TITLE);
     printf("═══════════════════════════════════════════\n");
     setColor(COLOR_HIGHLIGHT);
-    printf("📋 选中地图详情:\n");
+    printf("*选中地图详情:\n");
     setColor(COLOR_NORMAL);
     printf("名称: %s\n", selected->mapName);
     printf("难度: %d/10\n", selected->difficulty);
@@ -438,11 +438,11 @@ void displayMapSelection(MapSystem* map) {
     printf("状态: ");
     if (selected->isUnlocked) {
         setColor(COLOR_SUCCESS);
-        printf("✅ 已解锁\n");
+        printf(" 已解锁\n");
     }
     else {
         setColor(COLOR_WARNING);
-        printf("🔒 未解锁 (需要等级 %d)\n", selected->unlockLevel);
+        printf(" 未解锁 (需要等级 %d)\n", selected->unlockLevel);
     }
     setColor(COLOR_NORMAL);
     setColor(COLOR_TITLE);
@@ -672,7 +672,7 @@ void displayPlayerStatus(MapSystem* map) {
     setColor(COLOR_TITLE);
     printf("═══════════════════════════════════════════\n");
     setColor(COLOR_HIGHLIGHT);
-    printf("👤 玩家状态\n");
+    printf("@ 玩家状态\n");
     setColor(COLOR_NORMAL);
 
     printf("名称: %s\n", map->player->name);
@@ -710,7 +710,7 @@ void displayPlayerStatus(MapSystem* map) {
     printf("═══════════════════════════════════════════\n");
 }
 
-void displayControls(MapSystem* map) {
+void mapdisplayControls(MapSystem* map) {
     printf("🎮 操作说明:\n");
     printf("W/A/S/D - 移动 (上/左/下/右)\n");
     printf("E       - 与当前位置交互\n");
@@ -799,7 +799,7 @@ void triggerEvent(MapSystem* map, MapCell* cell) {
     clearScreen();
     setColor(COLOR_TITLE);
     printf("═══════════════════════════════════════════\n");
-    printf("🎭 事件触发\n");
+    printf("! 事件触发\n");
     printf("═══════════════════════════════════════════\n");
     setColor(COLOR_NORMAL);
 
@@ -832,14 +832,14 @@ void triggerEvent(MapSystem* map, MapCell* cell) {
 
         int answer = getch() - '0';
         if (answer == 2) {
-            printf("\n✅ 回答正确！风无形无体却能行走和发声。\n");
+            printf("\n回答正确！风无形无体却能行走和发声。\n");
             if (map->player) {
                 gainExp(map->player, 50);
                 printf("获得 50 经验值！\n");
             }
         }
         else {
-            printf("\n❌ 回答错误！正确答案是：风\n");
+            printf("\n回答错误！正确答案是：风\n");
         }
         break;
 
@@ -884,7 +884,7 @@ void openTreasure(MapSystem* map, MapCell* cell) {
     clearScreen();
     setColor(COLOR_TITLE);
     printf("═══════════════════════════════════════════\n");
-    printf("💎 打开宝箱\n");
+    printf("打开宝箱\n");
     printf("═══════════════════════════════════════════\n");
     setColor(COLOR_NORMAL);
 
@@ -902,14 +902,17 @@ void openTreasure(MapSystem* map, MapCell* cell) {
         }
         break;
 
-    case TREASURE_ITEM:
-        printf("获得了一件神秘物品！\n");
-		addItem(map->backpack, getRandomItem(ITEM_TOOL,cell->itemId));
+    case TREASURE_ITEM: {
+        Item* tool = getRandomItem(ITEM_TOOL, cell->itemId);
+        addItem(map->backpack, tool);
+        printf("获得了一件神秘物品！%s\n", tool->name);
         break;
-
-    case TREASURE_RELIC:
-        printf("发现了古代遗物！\n");
-		addItem(map->backpack, getRandomItem(ITEM_RELIC,cell->itemId));
+    }
+    case TREASURE_RELIC: {
+        Item* relic = getRandomItem(ITEM_RELIC, cell->itemId);
+        addItem(map->backpack, relic);
+        printf("发现了古代遗物！%s\n",relic->name);
+    }
         break;
 
     case TREASURE_KEY:
@@ -947,7 +950,7 @@ void interactCurrentCell(MapSystem* map) {
 
     setColor(COLOR_TITLE);
     printf("═══════════════════════════════════════════\n");
-    printf("📍 当前位置交互\n");
+    printf("当前位置交互\n");
     printf("═══════════════════════════════════════════\n");
     setColor(COLOR_NORMAL);
 
@@ -992,7 +995,7 @@ void interactCurrentCell(MapSystem* map) {
 
     case MAP_NPC:
         printf("要与NPC对话吗？ (Y/N)\n");
-        int ch = getch();
+        int ch = _getch();
         if (ch == 'y' || ch == 'Y') {
             triggerEvent(map, currentCell);
         }
@@ -1000,20 +1003,19 @@ void interactCurrentCell(MapSystem* map) {
 
     case MAP_SHOP:
         printf("要进入商店吗？ (Y/N)\n");
-        ch = getch();
+        ch = _getch();
         if (ch == 'y' || ch == 'Y') {
-            shop();
-            printf("商店系统需要集成...\n");
+            shop(map->backpack);
             pressAnyKey();
         }
         break;
 
     case MAP_MONSTER:
         printf("发现怪物！要战斗吗？ (Y/N)\n");
-        ch = getch();
+        ch = _getch();
         if (ch == 'y' || ch == 'Y') {
             // 简单的战斗模拟
-            printf("\n⚔️ 战斗开始！\n");
+            printf("\n 战斗开始！\n");
 
             // 计算伤害
             int playerDamage = map->player->strength / 2 + rand() % 6;
@@ -1032,7 +1034,7 @@ void interactCurrentCell(MapSystem* map) {
             // 获得经验
             gainExp(map->player, 30);
 
-            printf("\n✅ 成功击败了怪物！\n");
+            printf("\n成功击败了怪物！\n");
             printf("获得 30 经验值！\n");
         }
         pressAnyKey();
@@ -1041,7 +1043,7 @@ void interactCurrentCell(MapSystem* map) {
     case MAP_STAIR:
         printf("这是一个楼梯，要使用吗？ (Y/N)\n");
         printf("U - 上楼  |  J - 下楼\n");
-        ch = getch();
+        ch = _getch();
         if (ch == 'u' || ch == 'U') {
             changeLayer(map, map->currentLayer - 1);
         }
@@ -1079,7 +1081,7 @@ void runMapExploration(MapSystem* map) {
         displayPlayerStatus(map);
 
         // 显示操作说明
-        displayControls(map);
+        mapdisplayControls(map);
 
         // 处理输入
         int ch = getch();
@@ -1110,7 +1112,7 @@ void runMapExploration(MapSystem* map) {
             break;
 
         case 'b': case 'B':
-            backpack();
+            backpack(map->player,map->backpack);
             pressAnyKey();
             break;
 
@@ -1153,7 +1155,7 @@ void runMapExploration(MapSystem* map) {
 
     if (!isPlayerAlive(map->player)) {
         setColor(COLOR_WARNING);
-        printf("\n💀 玩家已死亡！游戏结束。\n");
+        printf("\n玩家已死亡！游戏结束。\n");
         setColor(COLOR_NORMAL);
 
         // 重置玩家状态
